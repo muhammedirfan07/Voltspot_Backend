@@ -10,6 +10,7 @@ const io = setupSocket(notific);
 const userRouter=require("./router/userRouter")
 const patnerRouter =require("./router/patenerRouter")
 const bookingRouter =require("./router/bookingRoutes")
+const vehicleRouter = require("./router/vehcileRoutes")
 const stationRouter =require("./router/chargingStationRoutes")
 
 // Pass io to your routes or controller
@@ -26,6 +27,7 @@ Server.use(userRouter)
 Server.use(patnerRouter)
 Server.use(bookingRouter)
 Server.use(stationRouter)
+Server.use(vehicleRouter)
 Server.use('/uploads',express.static('uploads'))
 
  // Initialize Socket.io

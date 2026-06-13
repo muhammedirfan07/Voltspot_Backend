@@ -2,9 +2,9 @@ const Booking = require("../Models/bookingModel");
 const evstations = require("../Models/evChargingStationModel");
 
 // -----------------------------get  avilable solat ---------------------------------------------
-exports. getAvailableSlots = async (req, res) => {
+exports.getAvailableSlots = async (req, res) => {
   console.log("inside the avilable sloat...✔️✔️");
-  
+
   try {
     const { stationId, startTime, duration } = req.query;
 
@@ -15,11 +15,13 @@ exports. getAvailableSlots = async (req, res) => {
     const endTime = new Date(new Date(startTime).getTime() + duration * 60 * 60 * 1000);
 
     // Get all booked slots for this station and time range
+    const start = new Date(startTime);
+
     const bookedSlots = await Booking.find({
       stationId,
       status: "confirmed",
       $or: [
-        { startTime: { $lt: endTime }, endTime: { $gt: startTime } }, // Overlapping bookings
+        { startTime: { $lt: endTime }, endTime: { $gt: start } },
       ],
     }).select("slotNumber");
 
@@ -37,8 +39,8 @@ exports. getAvailableSlots = async (req, res) => {
     const availableSlots = allSlots.filter(slot => !bookedSlotNumbers.includes(slot));
 
     res.status(200).json({ availableSlots });
-    console.log("slot:",availableSlots);
-    
+    console.log("slot:", availableSlots);
+
   } catch (error) {
     console.error("Error fetching available slots:", error);
     res.status(500).json({ message: "Server error" });
@@ -46,15 +48,19 @@ exports. getAvailableSlots = async (req, res) => {
 };
 //////////////////////////////////////////////////////////////////////
 // ----------------------------------booking sloat ----------------------------------------------------
-exports. bookSlot = async (req, res) => {
+exports.bookSlot = async (req, res) => {
   try {
     console.log("inside the booking sloat..💜💜");
-    
-    const { userId, stationId, slotNumber, startTime, duration} = req.body;
 
-    if (!userId || !stationId || !slotNumber || !startTime || !duration ) {
+    const { userId, stationId, slotNumber, startTime, duration } = req.body;
+
+    if (!userId || !stationId || !slotNumber || !startTime || !duration) {
       return res.status(400).json({ message: "Missing required fields" });
     }
+
+    if (duration < 1 || duration > 10) {
+  return res.status(400).json({ message: "Duration must be between 1 and 10 hours" });
+}
 
     const endTime = new Date(new Date(startTime).getTime() + duration * 60 * 60 * 1000);
 
@@ -67,12 +73,12 @@ exports. bookSlot = async (req, res) => {
         { startTime: { $lt: endTime }, endTime: { $gt: startTime } }, // Overlapping bookings
       ],
     });
-    
-    console.log("existingBooking :" ,existingBooking);
-    
+
+    console.log("existingBooking :", existingBooking);
+
 
     if (existingBooking) {
-      return res.status(400).json({ message: "Slot already booked for this time" });
+      return res.status(400).json({ message: `Slot already booked for this time ${existingBooking.duration} hours ` });
     }
 
     // Get station details for pricing
@@ -95,8 +101,8 @@ exports. bookSlot = async (req, res) => {
       endTime,
       status: "confirmed",
     });
-    console.log("newBooking",newBooking);
-    
+    console.log("newBooking", newBooking);
+
 
     await newBooking.save();
 
@@ -123,13 +129,12 @@ exports.getBookingHistory = async (req, res) => {
 
     // Fetch booking history with station details
     const bookings = await Booking.find({ userId })
-      .populate("stationId", "stationName city state chargingType") 
-      .select("stationId slotNumber startTime endTime duration totalPrice status"); 
+      .populate("stationId", "stationName city state chargingType").sort({ createdAt: -1 })
+      .select("stationId slotNumber startTime endTime duration totalPrice status");
 
     if (!bookings.length) {
       return res.status(404).json({ message: "No booking history found" });
     }
-
     res.status(200).json({ bookings });
     console.log("history :", bookings);
   } catch (error) {

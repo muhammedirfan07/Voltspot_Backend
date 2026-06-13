@@ -49,7 +49,7 @@ exports.getallReviws = async (req, res) => {
             query.station = stationId; 
         }
 
-        const allReviews = await RatingAndReview.find(query).populate("user", "fullName"); // Populate user details
+        const allReviews = await RatingAndReview.find(query).populate("user", "fullName").sort({createdAt:-1}); // Populate user details
         res.status(200).json(allReviews);
         console.log("All reviews:", allReviews);
     } catch (error) {

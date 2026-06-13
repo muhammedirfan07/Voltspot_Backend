@@ -99,6 +99,7 @@ exports.addChargingStation = async (req, res) => {
 //---------------------------------------------------Get All Charging Stations to admin ---------------------------------------------------------------------------------
 exports.getAllStations = async (req, res) => {
   console.log("inside getAllStations.....🚗🚗🚗🚗🚗🚗");
+  
   try {
     const Allstations = await evstations.find({});
     res.status(200).json(Allstations);
@@ -241,7 +242,8 @@ exports.approveAndRejectStaion = async (req, res) => {
   const io = req.io;
   console.log("Inside the approve station controller🫂🫂🫂");
 
-  try {
+  try { 
+  
     const { status, rejectionReason } = req.body;
     const stationId = req.params.id;
     console.log("Station ID:", stationId);

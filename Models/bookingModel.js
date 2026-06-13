@@ -5,7 +5,7 @@ const bookingSchema = new mongoose.Schema({
   bookingId: {
     type: Number,
     unique: true,
-  }, // Auto-increment ID
+  }, 
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",
@@ -41,6 +41,10 @@ const bookingSchema = new mongoose.Schema({
     enum: ["confirmed", "canceled"],
     default: "confirmed",
   },
+  createdAt: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 // Auto-increment booking ID

@@ -17,10 +17,12 @@ router.get("/admin/UserCount",UserController.getAllUserCount)
 //get user details  - in admin dashboard---------
 router.get("/user/userDetails/:id",UserAuthoMiddleware,UserController.singleUserDetails)
 
-// add rayting and views
+// add rating and views
 router.post("/addreview",UserAuthoMiddleware,ratingController.addRatingAndReviews)
-// add rayting and views
+// add rating and views
 router.get("/viewreview",UserAuthoMiddleware,ratingController.getallReviws)
+
+
 
 // user payment-----------
 router.post("/user/payment",paymentController.makePayment)
