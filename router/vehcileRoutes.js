@@ -10,5 +10,9 @@ router.post("/createVehicle",UserAuthoMiddleare,vehicleController.CreateVehicle)
 router.get("/viewVehicle",UserAuthoMiddleare,vehicleController.ViewVehicle)
 // view single vehicle
 router.get("/singleVehicle/:useId",UserAuthoMiddleare,vehicleController.ViewVehicle)
+// update vehicle data
+router.put("/updateVehicle/:id",UserAuthoMiddleare,vehicleController.UpdateVehicle)
+// delete vehicle data ..
+router.delete("/removeVehicle/:id",UserAuthoMiddleare,vehicleController.RemoveVehicle)
 
 module.exports=router   
