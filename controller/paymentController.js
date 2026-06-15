@@ -6,7 +6,7 @@ exports.makePayment = async (req, res) => {
     console.log("inside the payment page m....🤑🤑🤑🤑");
     
     const { userId, stationId, price } = req.body;
-    console.log("paymetDatas:",req.body);
+    console.log("payment Data :",req.body);
     
 
     const session = await stripe.checkout.sessions.create({
@@ -22,7 +22,7 @@ exports.makePayment = async (req, res) => {
               name: `EV Charging Slot`,
               description: `Charging Station ID: ${stationId}`,
             },
-            unit_amount: price * 100, // Convert to paise
+            unit_amount: price * 100, 
           },
           quantity: 1,
         },

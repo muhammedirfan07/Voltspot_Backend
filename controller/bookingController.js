@@ -1,7 +1,7 @@
 const Booking = require("../Models/bookingModel");
 const evstations = require("../Models/evChargingStationModel");
 
-// -----------------------------get  avilable solat ---------------------------------------------
+// -----------------------------get  available slot ---------------------------------------------
 exports.getAvailableSlots = async (req, res) => {
   console.log("inside the avilable sloat...✔️✔️");
 
@@ -47,7 +47,7 @@ exports.getAvailableSlots = async (req, res) => {
   }
 };
 //////////////////////////////////////////////////////////////////////
-// ----------------------------------booking sloat ----------------------------------------------------
+// ----------------------------------booking slot ----------------------------------------------------
 exports.bookSlot = async (req, res) => {
   try {
     console.log("inside the booking sloat..💜💜");
@@ -144,17 +144,6 @@ exports.getBookingHistory = async (req, res) => {
 };
 //////////////////////////////////////////////////////////////////////////////////
 
-//  Create a new booking------------------------------------------
-exports.createBooking = async (req, res) => {
-  try {
-    const newBooking = new Booking(req.body);
-    const savedBooking = await newBooking.save();
-    res.status(201).json({ message: "Booking confirmed", data: savedBooking });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-//////////////////////////////////////////////////////////////////////////////////////
 
 //  Get all bookings---------------------------------------------------
 exports.getAllBookings = async (req, res) => {

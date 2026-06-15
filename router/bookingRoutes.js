@@ -9,8 +9,6 @@ router.get("/user/slots",UserAuthoMiddleware,bookingController.getAvailableSlots
 router.post("/user/booking",UserAuthoMiddleware,bookingController.bookSlot)
 // Get all bookings---------------------------------------------
 router.get("/veiw-allBooking",UserAuthoMiddleware, bookingController.getBookingHistory);
-// Routes for bookings---------------------------------------------
-router.post("/bookingSation", bookingController.createBooking);
 
 // Filtering bookings by city, state, charging type, or vehicle type---------------------------------------------
 router.get("/filterBooking", bookingController.filterBookings);
