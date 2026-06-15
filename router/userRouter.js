@@ -10,6 +10,9 @@ const router = new express.Router()
 router.post("/Register",UserController.UserRegisterController)
 // login user & admin -----------------------
 router.post("/login",UserController.UserLoginController)
+// google authentication 
+router.post("/google-login",UserController.GoogleLoginController);
+
 // get all user details - in admin dashboard----------
 router.get("/admin/allUsers",UserController.getAllUearsDetails)
 //get all number of users  - in admin dashboard---------
@@ -21,7 +24,6 @@ router.get("/user/userDetails/:id",UserAuthoMiddleware,UserController.singleUser
 router.post("/addreview",UserAuthoMiddleware,ratingController.addRatingAndReviews)
 // add rating and views
 router.get("/viewreview",UserAuthoMiddleware,ratingController.getallReviws)
-
 
 
 // user payment-----------

@@ -101,6 +101,52 @@ exports.getAllUearsDetails= async(req,res)=>{
     }
 }
 //=======================================================================================================================================================
+exports.GoogleLoginController =async (req, res) => {
+  console.log(" inside the google authentication controller--");
+  const {
+    fullName,
+    email,
+    googleId
+  } = req.body;
+  console.log("req.body =", req.body);
+  
+  try {
+    let user =await users.findOne({email});
+    console.log("user ==",user);
+    
+    if (!user) {
+      user = await users.create({
+        fullName,
+        email,
+        googleId: email
+      });
+    }
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        role: user.role
+      },
+      process.env.JWTPASSWORD,
+      {
+        expiresIn: "7d"
+      }
+    );
+    console.log("token =",token);
+    
+
+    res.status(200).json({
+      user,
+      token
+    });
+
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server Error"
+    });
+  }
+};
 
 // get number of user count==============================================================================================================================
 exports.getAllUserCount =async(req,res)=>{

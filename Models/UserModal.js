@@ -13,8 +13,9 @@ const UserSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true  
+        default: null 
     },
+     googleId: String,
     role: {
         type: String,
         enum: ["user", "admin"], // Only allow 'user' or 'admin'
