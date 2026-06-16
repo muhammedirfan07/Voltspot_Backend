@@ -74,7 +74,7 @@ exports.patnerLoginController = async (req, res) => {
         console.log("Token Payload:", tokenPayload);
 
         // Generate JWT token
-        const token = jwt.sign(
+        const PartnerToken = jwt.sign(
             tokenPayload,
             process.env.JWTPASSWORD,
             { expiresIn: "7d" } // Token expires in 7 days
@@ -83,7 +83,7 @@ exports.patnerLoginController = async (req, res) => {
         return res.status(200).json({
             status: "success",
             partner: existingPatner,
-            token
+            PartnerToken
         });
 
     } catch (error) {
