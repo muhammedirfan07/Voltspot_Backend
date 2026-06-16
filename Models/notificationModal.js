@@ -6,6 +6,11 @@ const notificationSchema = new mongoose.Schema({
     ref: "patners",
     required: true,
   },
+  stationId:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref :"evstations",
+    required:true
+  },
   message: {
     type: String,
     required: true,

@@ -264,6 +264,7 @@ exports.approveAndRejectStaion = async (req, res) => {
     // Create a notification for the partner
     const newnotification = new notifications({
       partnerId: station.partnerId,
+      stationId: station._id,
       message:
         status === "approved"
         ? `Your station "${station.stationName}" has been ${status}.`

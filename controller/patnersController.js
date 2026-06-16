@@ -165,12 +165,11 @@ exports.getAllPatnerCount =async(req,res)=>{
 
 // get notification approved and rejected-----------------------
 exports.getallNotifiaction= async (req,res)=>{
-    console.log("inside the  get notifcation ..");
+    console.log("inside the  get notification ..");
     try {
-        const notification = await notifications.find({ partnerId: req.partnerId });
-    res.status(200).json(notification); // Ensure this is an array 
-       console.log("notifations :",notification);
-        
+        const notification = await notifications.find({ partnerId: req.partnerId }).populate("stationId", "stationName");
+        console.log("notifications :",notification);
+    res.status(200).json(notification);   
     } catch (error) {
         res.status(500).json({ message: 'Error fetching notifications', error });
     }
