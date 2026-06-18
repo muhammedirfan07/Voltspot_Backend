@@ -1,4 +1,5 @@
 const patners =require("../Models/PatnerModal")
+const evstations = require("../Models/evChargingStationModel");
 const jwt =require("jsonwebtoken")
 const bcrypt =require("bcrypt")
 const generateVerificationCode =require("../util/generateVerificationCode")
@@ -140,9 +141,30 @@ exports.checkPtnerAuthoContoller =async(req,res)=>{
 exports.viewAllPatnersController =async(req,res)=>{
     console.log("inside the ViewAll Patener Controller...😶‍🌫️😶‍🌫️😶‍🌫️😶‍🌫️")
     try{
-        const allPatners =await patners.find({})
-        res.status(200).json(allPatners)
-        console.log(allPatners);
+        const allPartners =await patners.aggregate([
+            {  // need to display single user all station count
+                $lookup:{
+                    from:"evstations",
+                    localField:"_id",
+                    foreignField:"partnerId",
+                    as:"stations"
+                }
+                },
+                {
+                    $addFields:{
+                        stationCount:{$size:"$stations"}
+                    },
+                },
+                {
+                    $project:{
+                        password:0,
+                        verificationCode:0,
+                        stations:0
+                    }
+                }
+        ])
+        res.status(200).json(allPartners)
+        console.log("all partners=",allPartners);
         
     }catch(err){
         res.status(404).json(err)

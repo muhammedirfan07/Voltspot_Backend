@@ -27,7 +27,7 @@ const patnersSchema =new mongoose.Schema({
        type :String
     },role: {
         type: String,
-        default: "partner", // Add this field to identify partners
+        default: "partner", 
     }
 
 },{timestamps:true})
