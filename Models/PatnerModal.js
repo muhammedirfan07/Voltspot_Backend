@@ -25,7 +25,8 @@ const patnersSchema =new mongoose.Schema({
     },
     verificationCode:{
        type :String
-    },role: {
+    },
+    role: {
         type: String,
         default: "partner", 
     }

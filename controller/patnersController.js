@@ -136,6 +136,27 @@ exports.checkPtnerAuthoContoller =async(req,res)=>{
 
 }
 
+exports.reSendPartnerController = async (req, res) => {
+    console.log("Inside the re-send email --");
+    const { email } = req.body;
+    try {
+        const partner = await patners.findOne({ email });
+        if (!partner) {
+            return res.status(404).json({ status: false, message: "Partner not found" });
+        }
+        if (partner.isVerified) { 
+            return res.status(400).json({ status: false, message: "Already verified" });
+        }
+        const verificationCode = generateVerificationCode();
+        partner.verificationCode = verificationCode;
+        await partner.save();
+        SendVerificationCode(email, verificationCode);
+        return res.status(200).json({ status: true, message: "OTP Resent successfully" }); // ✅ res not partner
+    } catch (error) {
+        res.status(500).json({ status: false, message: "Something went wrong" });
+    }
+};
+
 //////////////////////////////////////////////////////////////////////////////
 //get all patners--------------------
 exports.viewAllPatnersController =async(req,res)=>{
