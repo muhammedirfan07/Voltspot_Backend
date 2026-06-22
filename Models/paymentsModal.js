@@ -9,8 +9,12 @@ const paymentSchema = new mongoose.Schema(
     },
     stationId: {
       type: mongoose.Schema.Types.ObjectId, 
-      ref: "Station", 
+      ref: "evstations", 
       required: true,
+    },
+    bookingId:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"Booking"
     },
     amount: {
       type: Number,
