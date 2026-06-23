@@ -13,4 +13,10 @@ router.get("/veiw-allBooking",UserAuthoMiddleware, bookingController.getBookingH
 // Filtering bookings by city, state, charging type, or vehicle type---------------------------------------------
 router.get("/filterBooking", bookingController.filterBookings);
 
+ //Cancel booking & Stripe refund 
+  router.put("/user/booking/:bookingId/cancel", UserAuthoMiddleware, bookingController.cancelBooking);
+
+ // Check slot availability before rebooking
+  router.post("/user/rebook-check", UserAuthoMiddleware, bookingController.rebookCheck)
+  ;
 module.exports = router;

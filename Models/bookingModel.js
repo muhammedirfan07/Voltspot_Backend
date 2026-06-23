@@ -27,7 +27,7 @@ const bookingSchema = new mongoose.Schema({
   startTime: {
     type: Date,
     required: true,
-  }, // Booking start time
+  }, 
   endTime: {
     type: Date,
     required: true,
@@ -37,14 +37,19 @@ const bookingSchema = new mongoose.Schema({
     required: true,
   },
   status: {
-    type: String,
-    enum: ["confirmed", "canceled"],
-    default: "confirmed",
-  },
+  type: String,
+  enum: ["pending", "confirmed", "canceled"],
+  default: "pending",   // ← was "confirmed"
+},
   createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    expiresAt: {
+  type: Date,
+  default: () => new Date(Date.now() + 10 * 60 * 1000),
+  index: { expireAfterSeconds: 0 },
+},
 });
 
 // Auto-increment booking ID

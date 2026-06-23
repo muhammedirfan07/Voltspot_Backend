@@ -3,6 +3,7 @@ const UserController =require("../controller/userController")
 const ratingController =require("../controller/ratingController")
 const paymentController =require("../controller/paymentController")
 const chartAndGraphController =require("../controller/chartAndGraphController")
+const walletController =require("../controller/walletController")
 const UserAuthoMiddleware=require("../middleware/UserAuthoMiddleare")
 const router = new express.Router()
 
@@ -31,5 +32,7 @@ router.post("/user/payment",paymentController.makePayment)
 
 // admin page chart and graph 
 router.get("/admin/chart",chartAndGraphController.getChartData)
+//wallet
+router.get("/wallet-summary",UserAuthoMiddleware,walletController.getWalletSummary)
 
 module.exports=router

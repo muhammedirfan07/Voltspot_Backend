@@ -12,6 +12,7 @@ const patnerRouter =require("./router/patenerRouter")
 const bookingRouter =require("./router/bookingRoutes")
 const vehicleRouter = require("./router/vehcileRoutes")
 const stationRouter =require("./router/chargingStationRoutes")
+const paymentController =require("./controller/paymentController")
 
 // Pass io to your routes or controller
 Server.use((req, res, next) => {
@@ -19,7 +20,11 @@ Server.use((req, res, next) => {
     next();
   });
 
-
+Server.post(
+     "/webhook",
+    express.raw({ type: "application/json" }),
+     paymentController.stripeWebhook
+   );
 Server.use(express.json())
 Server.use(express.urlencoded({ extended: true }));
 Server.use(cors())
