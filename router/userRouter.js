@@ -5,6 +5,7 @@ const paymentController =require("../controller/paymentController")
 const chartAndGraphController =require("../controller/chartAndGraphController")
 const walletController =require("../controller/walletController")
 const UserAuthoMiddleware=require("../middleware/UserAuthoMiddleare")
+const multerMiddleware =require("../middleware/multerMiddleware")
 const router = new express.Router()
 
 //register user and admin-------------
@@ -26,6 +27,9 @@ router.post("/addreview",UserAuthoMiddleware,ratingController.addRatingAndReview
 // add rating and views
 router.get("/viewreview",UserAuthoMiddleware,ratingController.getallReviws)
 
+// ← ADD THIS
+router.put(
+    "/user/updateProfile",UserAuthoMiddleware,multerMiddleware.single("profileImage"),UserController.updateUserProfile)
 
 // user payment-----------
 router.post("/user/payment",paymentController.makePayment)

@@ -1,51 +1,55 @@
-require('dotenv').config()
-const express =require('express')
-const cors =require('cors')
-require("./DB/dbConnection")
-const http =require("http")
-const {setupSocket,connectedPartners} = require("./Socket.io/socketConfig");
-const Server =express()
-const notific =http.createServer(Server)
-const io = setupSocket(notific);
-const userRouter=require("./router/userRouter")
-const patnerRouter =require("./router/patenerRouter")
-const bookingRouter =require("./router/bookingRoutes")
-const vehicleRouter = require("./router/vehcileRoutes")
-const stationRouter =require("./router/chargingStationRoutes")
-const paymentController =require("./controller/paymentController")
+// app.js — FIXED
+require("dotenv").config();
+const express= require("express");
+const cors= require("cors");
+require("./DB/dbConnection");
+const http= require("http");
+const { setupSocket } = require("./Socket.io/socketConfig");
 
-// Pass io to your routes or controller
+const userRouter    = require("./router/userRouter");
+const patnerRouter  = require("./router/patenerRouter");
+const bookingRouter = require("./router/bookingRoutes");
+const vehicleRouter = require("./router/vehcileRoutes");
+const stationRouter = require("./router/chargingStationRoutes");
+const paymentController = require("./controller/paymentController");
+
+const Server = express();
+const notific = http.createServer(Server);
+
+// ── Socket.io — setup ONCE only ───────────────────────────────────────────────
+const io = setupSocket(notific);   
+
 Server.use((req, res, next) => {
-    req.io = io;
-    next();
-  });
+  req.io = io;
+  next();
+});
 
+// ── Stripe webhook —  ───────────────────────────
 Server.post(
-     "/webhook",
-    express.raw({ type: "application/json" }),
-     paymentController.stripeWebhook
-   );
-Server.use(express.json())
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  paymentController.stripeWebhook
+);
+
+// ── Normal middleware ─────────────────────────────────────────────────────────
+Server.use(express.json());
 Server.use(express.urlencoded({ extended: true }));
-Server.use(cors())
-Server.use(userRouter)
-Server.use(patnerRouter)
-Server.use(bookingRouter)
-Server.use(stationRouter)
-Server.use(vehicleRouter)
-Server.use('/uploads',express.static('uploads'))
+Server.use(cors());
 
- // Initialize Socket.io
-setupSocket(notific);
+// ── Routes ────────────────────────────────────────────────────────────────────
+Server.use(userRouter);
+Server.use(patnerRouter);
+Server.use(bookingRouter);
+Server.use(stationRouter);
+Server.use(vehicleRouter);
+Server.use("/uploads", express.static("uploads"));
 
-const PORT =process.env.PORT ||5000
-Server.listen(PORT,()=>{
-    console.log(` sever is Running Sucessfully ${PORT} 😊😊`);
-    
-})
+// ── Health check ──────────────────────────────────────────────────────────────
+Server.get("/", (req, res) => {
+  res.status(200).send("<h1>Server is Running Successfully 😊</h1>");
+});
 
-Server.get("/",(req,res)=>{
-    res.status(200).send(`<h1> the server is Running Successfully..😊😊</h1>`)
-})
-
-
+const PORT = process.env.PORT || 5000;
+notific.listen(PORT, () => {
+  console.log(`Server is Running Successfully on port ${PORT} 😊`);
+});

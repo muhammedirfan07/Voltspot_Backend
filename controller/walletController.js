@@ -15,8 +15,9 @@ exports.getWalletSummary = async (req, res) => {
     const debits  = transactions.filter((t) => t.type === "debit");
 
     const walletBalance =
-      credits.reduce((s, t) => s + t.amount, 0) -
-      debits.reduce((s,  t) => s + t.amount, 0);
+      debits.reduce((s,  t) => s + t.amount, 0)-
+      credits.reduce((s, t) => s + t.amount, 0) 
+     
 
       console.log(" transaction of refund=",transactions);
       
@@ -33,7 +34,7 @@ exports.getWalletSummary = async (req, res) => {
       
 
     res.status(200).json({
-      walletBalance: Math.max(0, walletBalance),
+      walletBalance: Math.max( walletBalance),
       totalSpent:    payments
                        .filter((p) => p.status === "completed")
                        .reduce((s, p) => s + p.amount, 0),

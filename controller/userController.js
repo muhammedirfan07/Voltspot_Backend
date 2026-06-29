@@ -160,7 +160,7 @@ exports.getAllUserCount =async(req,res)=>{
     
 }
 
-// get single user details  uses authontiction and id
+// get single user details  uses authentication and id==============================================================================================================================
 exports.singleUserDetails =async(req,res)=>{
     console.log("inside the user details controller ..👤👤👤");
    
@@ -176,4 +176,30 @@ exports.singleUserDetails =async(req,res)=>{
     }
     
 }
+// update user profile (phone + profileImage)
+exports.updateUserProfile = async (req, res) => {
+    console.log("inside updateUserProfile...📝");
+    try {
+        const userId = req.userId; 
+        const { fullName, phone } = req.body;
 
+        const updateData = {};
+        if (fullName) updateData.fullName = fullName;
+        if (phone) updateData.phone = phone;
+        if (req.file) {
+            updateData.profileImage = `uploads/${req.file.filename}`;
+        }
+
+        const updatedUser = await users.findByIdAndUpdate(
+            userId,
+            { $set: updateData },
+            { new: true }
+        );
+        res.status(200).json({ message: "Profile updated successfully", user: updatedUser });
+        console.log("updateData =",updateData);
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Server error", details: error.message });
+    }
+};

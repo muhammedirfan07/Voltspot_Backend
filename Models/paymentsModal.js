@@ -1,9 +1,3 @@
-// paymentsModal.js — UPDATED
-// Changes:
-//   1. Added "refunded" to status enum (cancelBooking sets this)
-//   2. paymentDate now defaults to Date.now and is no longer required
-//      (webhook writes the doc without a manual paymentDate)
-
 const mongoose = require("mongoose");
 
 const paymentSchema = new mongoose.Schema(
@@ -28,7 +22,7 @@ const paymentSchema = new mongoose.Schema(
     },
     paymentDate: {
       type: Date,
-      default: Date.now,   // ← was required:true, now defaults to now
+      default: Date.now,   
     },
     transactionId: {
       type: String,
@@ -37,7 +31,6 @@ const paymentSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      // ← added "refunded" — cancelBooking sets payment.status = "refunded"
       enum: ["pending", "completed", "failed", "refunded"],
       default: "pending",
     },

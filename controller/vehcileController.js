@@ -98,7 +98,7 @@ exports.RemoveVehicle = async (req, res) => {
     const removeVehicle = await Vehicles.findByIdAndDelete(id);
     if (!removeVehicle)
       return res.status(404).json({ message: "Station not found" });
-    res.status(200).json({ message: " delete data .." });
+    res.status(200).json({ message: " delete vehicles successfully .." });
   } catch (error) {
     res.status(406).json({ error: error.message });
   }

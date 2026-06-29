@@ -2,12 +2,12 @@ const Booking = require("../Models/bookingModel");
 const evstations = require("../Models/evChargingStationModel");
 const Payments = require("../Models/paymentsModal");
 const WalletTransaction = require("../Models/walletTransactionModel");
- const { default: Stripe } = require("stripe");
+const { default: Stripe } = require("stripe");
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // -----------------------------get available slot ---------------------------------------------
 
-exports.getAvailableSlots = async (req, res) =>{
+exports.getAvailableSlots = async (req, res) => {
   console.log("inside the avilable sloat...✔️✔️");
   try {
     const { stationId, startTime, duration } = req.query;
@@ -71,16 +71,14 @@ exports.bookSlot = async (req, res) => {
     const existingBooking = await Booking.findOne({
       stationId,
       slotNumber,
-      status: { $in: ["confirmed", "pending"] }, 
+      status: { $in: ["confirmed", "pending"] },
       $or: [{ startTime: { $lt: endTime }, endTime: { $gt: startTime } }],
     });
 
     if (existingBooking)
-      return res
-        .status(400)
-        .json({
-          message: `Slot already booked for this time ${existingBooking.duration} hours`,
-        });
+      return res.status(400).json({
+        message: `Slot already booked for this time ${existingBooking.duration} hours`,
+      });
 
     const station = await evstations.findById(stationId);
     if (!station) return res.status(404).json({ message: "Station not found" });
@@ -95,12 +93,14 @@ exports.bookSlot = async (req, res) => {
       duration,
       totalPrice,
       endTime,
-       status: "pending",
+      status: "pending",
     });
 
     await newBooking.save();
-    console.log("✅ New booking saved, _id:", newBooking._id); 
-    res.status(200).json({ message: "Slot booked successfully", booking: newBooking });
+    console.log("✅ New booking saved, _id:", newBooking._id);
+    res
+      .status(200)
+      .json({ message: "Slot booked successfully", booking: newBooking });
   } catch (error) {
     console.error("Error booking slot:", error);
     res.status(500).json({ message: "Server error" });
@@ -114,16 +114,22 @@ exports.cancelBooking = async (req, res) => {
     const { bookingId } = req.params;
     const userId = req.userId;
 
-    // 1. Find the booking
+    // Find the booking
     const booking = await Booking.findById(bookingId);
     if (!booking) return res.status(404).json({ message: "Booking not found" });
-   
-    //  if (booking.status === "pending")
-    //      return res.status(400).json({ message: "Payment not completed yet — nothing to cancel" });
+
+    // 15 min after no cancel--
+    const bookedAt = new Date(booking.createdAt);
+    const diffMinutes = (Date.now() - bookedAt.getTime()) / (1000 * 60);
+    if (diffMinutes > 15) {
+      return res
+        .status(400)
+        .json({ message: "Cancellation window has expired (15 minutes)" });
+    }
     if (String(booking.userId) !== String(userId))
       return res
         .status(403)
-        .json({ message: "Not authorised to cancel this booking" });
+        .json({ message: "Not authorized to cancel this booking" });
 
     if (booking.status === "canceled")
       return res.status(400).json({ message: "Booking already cancelled" });
@@ -169,7 +175,7 @@ exports.cancelBooking = async (req, res) => {
       await payment.save();
     }
 
-    // 3. Add wallet credit
+    //  Add wallet credit
     const walletCredit = new WalletTransaction({
       userId,
       type: "credit",
@@ -181,7 +187,7 @@ exports.cancelBooking = async (req, res) => {
     });
     await walletCredit.save();
 
-    // 4. Mark booking canceled
+    //  Mark booking canceled
     booking.status = "canceled";
     await booking.save();
 
@@ -220,12 +226,10 @@ exports.rebookCheck = async (req, res) => {
         message: `Slot ${slotNumber} is already booked. Please choose another slot.`,
       });
 
-    res
-      .status(200)
-      .json({
-        message: "Slot available. Proceed to payment.",
-        available: true,
-      });
+    res.status(200).json({
+      message: "Slot available. Proceed to payment.",
+      available: true,
+    });
   } catch (err) {
     console.error("rebookCheck error:", err);
     res.status(500).json({ message: "Server error" });
@@ -244,10 +248,9 @@ exports.getBookingHistory = async (req, res) => {
       .populate("stationId", "stationName city state chargingType")
       .sort({ createdAt: -1 })
       .select(
-        "stationId slotNumber startTime endTime duration totalPrice status bookingId",
+        "stationId slotNumber startTime endTime duration totalPrice status bookingId createdAt",
       );
-      console.log("booking history =",bookings);
-      
+    console.log("booking history =", bookings);
 
     if (!bookings.length)
       return res.status(404).json({ message: "No booking history found" });
