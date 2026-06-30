@@ -21,13 +21,18 @@ router.get("/admin/allUsers",UserController.getAllUearsDetails)
 router.get("/admin/UserCount",UserController.getAllUserCount)
 //get user details  - in admin dashboard---------
 router.get("/user/userDetails/:id",UserAuthoMiddleware,UserController.singleUserDetails)
+//forgot passwords -----------------------
+router.post("/forgot-password",UserController.forgotPassword)
+router.get("/resent-password/:token",UserController.VerifyResetTokenController)
+router.post("/resent-password/:token",UserController.ResetPasswordController)
+
 
 // add rating and views
 router.post("/addreview",UserAuthoMiddleware,ratingController.addRatingAndReviews)
 // add rating and views
 router.get("/viewreview",UserAuthoMiddleware,ratingController.getallReviws)
 
-// ← ADD THIS
+//
 router.put(
     "/user/updateProfile",UserAuthoMiddleware,multerMiddleware.single("profileImage"),UserController.updateUserProfile)
 

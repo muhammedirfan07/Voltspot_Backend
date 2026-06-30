@@ -112,5 +112,29 @@ exports.WelcomeEmail = async (email,StationName)=>{
     }
 }
 
+exports.sendForgotPasswordEmail =async(resetLink,existUser)=>{
+    try {
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to:existUser.email,
+            subject: "VoltSpot - Reset Your Password",
+            html: `
+                <h2>Password Reset Request</h2>
+                <p>Hi ${existUser.fullName},</p>
+                <p>Click the link below to reset your password. This link expires in 1 minutes.</p>
+                <a href="${resetLink}" style="display:inline-block;padding:10px 20px;background:#10b981;color:#fff;text-decoration:none;border-radius:6px;">
+                    Reset Password
+                </a>
+                <p>If you didn't request this, you can safely ignore this email.</p>
+            `
+        });
+    } catch (error) {
+         console.log("=============================================");
+          console.log("resend password sending  error",error); 
+          console.log("=============================================");         
+    }
+}
+
+
 
 

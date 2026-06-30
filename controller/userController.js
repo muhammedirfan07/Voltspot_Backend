@@ -1,6 +1,8 @@
 const users=require("../Models/UserModal")
 const jwt= require("jsonwebtoken")
 const bcrypt =require("bcrypt");
+const { sendForgotPasswordEmail } = require("../Emails/sendEmail");
+
 
 //register================================================================================================================================================
 exports.UserRegisterController = async (req, res) => {
@@ -88,6 +90,101 @@ exports.UserLoginController = async (req, res) => {
     }
 };
 // ======================================================================================================================================================
+//forgot password ============================================
+exports.forgotPassword =async(req,res)=>{
+    console.log("Inside ForgotPasswordController...📧")
+    const {email}=req.body
+    console.log("email=",req.body);
+    
+    try {
+         if (!email) {
+            return res.status(400).json({ error: "Email is required" });
+        }
+        const existUser = await users.findOne({ email });
+        console.log("exist=",existUser);
+        
+        if (!existUser) {
+            return res.status(404).json({ error: "No account found with this email" });
+        }
+           const resetToken = jwt.sign(
+            { userId: existUser._id, purpose: "reset-password" },
+            process.env.JWTPASSWORD,
+            { expiresIn: "15m" }      
+        );
+         console.log( "Reset token =",resetToken);
+         const resetLink = `${process.env.CLIENT_URL}/resent-password/${resetToken}`;
+         console.log(resetLink);
+         
+          await sendForgotPasswordEmail(resetLink,existUser)
+         res.status(200).json({ message: "Password reset link sent to your email" });
+        
+    } catch (error) {
+         console.error("ForgotPasswordController Error:", error);
+        res.status(500).json({ error: "Server error", details: error.message });
+    }
+    
+}
+// Verify token before showing reset form =========
+exports.VerifyResetTokenController = async (req, res) => {
+    console.log("Inside VerifyResetTokenController...🔍");
+    const { token } = req.params;
+ 
+    try {
+        const decoded = jwt.verify(token, process.env.JWTPASSWORD);
+ 
+        if (decoded.purpose !== "reset-password") {
+            return res.status(400).json({ error: "Invalid token" });
+        }
+ 
+        res.status(200).json({ message: "Token valid" });
+ 
+    } catch (error) {
+        return res.status(400).json({ error: "Reset link is invalid or expired" });
+    }
+};
+
+// resend Password ===============================
+exports.ResetPasswordController = async (req, res) => {
+    console.log("Inside ResetPasswordController...🔑");
+    const { token } = req.params;
+    const { newPassword, confirmPassword } = req.body;
+ 
+    try {
+        if (!newPassword || !confirmPassword) {
+            return res.status(400).json({ error: "Both password fields are required" });
+        }
+ 
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({ error: "Passwords do not match" });
+        } 
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWTPASSWORD);
+        } catch (err) {
+            return res.status(400).json({ error: "Reset link is invalid or expired" });
+        }
+ 
+        if (decoded.purpose !== "reset-password") {
+            return res.status(400).json({ error: "Invalid token" });
+        }
+ 
+        const existUser = await users.findById(decoded.userId);
+        console.log("existedUSer-resend password  =",existUser);
+        
+        if (!existUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
+ 
+        existUser.password = newPassword;
+        await existUser.save();
+ 
+        res.status(200).json({ message: "Password reset successful. Please log in." });
+ 
+    } catch (error) {
+        console.error("ResetPasswordController Error:", error);
+        res.status(500).json({ error: "Server error", details: error.message });
+    }
+};
 
 //get all user details====================================================================================================================================
 exports.getAllUearsDetails= async(req,res)=>{
