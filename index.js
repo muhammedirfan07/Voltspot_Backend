@@ -12,7 +12,7 @@ const bookingRouter = require("./router/bookingRoutes");
 const vehicleRouter = require("./router/vehcileRoutes");
 const stationRouter = require("./router/chargingStationRoutes");
 const paymentController = require("./controller/paymentController");
-
+const fs =require("fs")
 const Server = express();
 const notific = http.createServer(Server);
 
@@ -42,7 +42,11 @@ Server.use(patnerRouter);
 Server.use(bookingRouter);
 Server.use(stationRouter);
 Server.use(vehicleRouter);
-Server.use("/uploads", express.static("uploads"));
+// Server.use("/uploads", express.static("uploads"));
+const fs = require('fs')
+if (!fs.existsSync('./uploads')) {
+  fs.mkdirSync('./uploads')
+}
 
 // ── Health check ──────────────────────────────────────────────────────────────
 Server.get("/", (req, res) => {

@@ -1,7 +1,8 @@
 const evstations = require("../Models/evChargingStationModel");
 const notifications = require("../Models/notificationModal");
 const { io, connectedPartners } = require("../Socket.io/socketConfig");
-
+const fs =require("fs")
+const path =require("path")
 // Utility function to validate latitude and longitude
 const isValidCoordinates = (longitude, latitude) => {
   const lon = parseFloat(longitude);
@@ -159,6 +160,9 @@ exports.updateStation = async (req, res) => {
     } = req.body;
     console.log("req.body:", req.body);
 
+    const station = await evstations.findById(req.params.id);
+    if (!station) return res.status(404).json({ message: "Station not found" });
+
     const updateData = {
       stationName,
       location: {
@@ -175,7 +179,16 @@ exports.updateStation = async (req, res) => {
     };
 
     // If a new image is uploaded, update the image path
-    if (req.file) updateData.image = req.file.path;
+    if (req.file) {
+      updateData.image = req.file.path;
+
+      // delete old image file
+      if (station.image) {
+        fs.unlink(path.resolve(station.image), (err) => {
+          if (err) console.log("Old image delete failed:", err.message);
+        });
+      }
+    }
 
     const updatedStation = await evstations.findByIdAndUpdate(
       req.params.id,
@@ -205,6 +218,12 @@ exports.deleteStation = async (req, res) => {
     const deletedStation = await evstations.findByIdAndDelete(id);
     if (!deletedStation)
       return res.status(404).json({ message: "Station not found" });
+    
+    if (deletedStation.image) {
+      fs.unlink(path.resolve(deletedStation.image), (err) => {
+        if (err) console.log("Image delete failed:", err.message);
+      });
+    } 
 
     res.status(200).json({ message: "Station deleted successfully" });
   } catch (error) {
