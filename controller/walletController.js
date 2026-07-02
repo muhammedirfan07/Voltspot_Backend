@@ -14,13 +14,12 @@ exports.getWalletSummary = async (req, res) => {
     const credits = transactions.filter((t) => t.type === "credit");
     const debits  = transactions.filter((t) => t.type === "debit");
 
-    const walletBalance =
+    const Balance =
       debits.reduce((s,  t) => s + t.amount, 0)-
       credits.reduce((s, t) => s + t.amount, 0) 
      
-
       console.log(" transaction of refund=",transactions);
-      
+     const walletBalance = Math.abs(Balance) 
 
     // Real Stripe payment records both completed and refunded
     const payments = await Payments.find({

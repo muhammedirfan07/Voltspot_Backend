@@ -9,8 +9,7 @@ const evChargingStationSchema = new mongoose.Schema({
   stationName: {
     type: String,
     required: true,
-    trim: true,
-    
+    trim: true,  
   },
   location: {
     type: {
