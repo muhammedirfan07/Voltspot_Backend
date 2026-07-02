@@ -276,24 +276,22 @@ exports.approveAndRejectStaion = async (req, res) => {
     await newnotification.save();
 
     // Emit notification if the partner is connected
-    // try {
-    //   const partnerIdStr = station.partnerId.toString();
-    //   console.log("Current connectedPartners:", connectedPartners);
-    //   console.log("Checking for partner:", partnerIdStr);
-    //   if (connectedPartners[partnerIdStr]) {
-    //     io.to(connectedPartners[partnerIdStr]).emit("notification", {
-    //       message: newnotification.message,
-    //       status,
-    //     });
-    //   } else {
-    //     console.warn("Partner not connected:", partnerIdStr);
-    //   }
-    // } catch (socketError) {
-    //   console.error("Socket emission error:", socketError);
-    // }
-    res
-      .status(200)
-      .json({ message: `Station ${status} successfully`, station });
+    try {
+      const partnerIdStr = station.partnerId.toString();
+      console.log("Current connectedPartners:", connectedPartners);
+      console.log("Checking for partner:", partnerIdStr);
+      if (connectedPartners[partnerIdStr]) {
+        io.to(connectedPartners[partnerIdStr]).emit("notification", {
+          message: newnotification.message,
+          status,
+        });
+      } else {
+        console.warn("Partner not connected:", partnerIdStr);
+      }
+    } catch (socketError) {
+      console.error("Socket emission error:", socketError);
+    }
+    
   } catch (error) {
     console.error("Error updating station status:", error);
     res.status(500).json({
