@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-const patnersSchema =new mongoose.Schema({
+const patnersSchema = new mongoose.Schema({
     StationName:{
         type:String,
         required:true
@@ -30,11 +30,15 @@ const patnersSchema =new mongoose.Schema({
         type: String,
         default: "partner", 
     },
-    expiresAt :{
-        type:Date,
-        default :()=>new Date(Date.now()+10*60*1000)
+    expiresAt:{
+        type: Date,
+        default: () => new Date(Date.now() + 10*60*1000), // 10 min from creation
     }
+
 },{timestamps:true})
-patnersSchema.index({expiresAt:1},{exprireAfterSeonds:0})
-const patners =mongoose.model("patners",patnersSchema)
-module.exports=patners
+
+
+patnersSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 })
+
+const patners = mongoose.model("patners", patnersSchema)
+module.exports = patners

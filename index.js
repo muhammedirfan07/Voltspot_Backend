@@ -42,8 +42,7 @@ Server.use(patnerRouter);
 Server.use(bookingRouter);
 Server.use(stationRouter);
 Server.use(vehicleRouter);
-// Server.use("/uploads", express.static("uploads"));
-const fs = require('fs')
+// Server.use("/uploads", express.static("uploads"));g
 if (!fs.existsSync('./uploads')) {
   fs.mkdirSync('./uploads')
 }
