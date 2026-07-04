@@ -29,9 +29,12 @@ const patnersSchema =new mongoose.Schema({
     role: {
         type: String,
         default: "partner", 
+    },
+    expiresAt :{
+        type:Date,
+        default :()=>new Date(Date.now()+10*60*1000)
     }
-
 },{timestamps:true})
-
+patnersSchema.index({expiresAt:1},{exprireAfterSeonds:0})
 const patners =mongoose.model("patners",patnersSchema)
 module.exports=patners

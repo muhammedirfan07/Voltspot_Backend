@@ -108,6 +108,7 @@ exports. verifyEmailController= async(req,res)=>{
         }
         verifedPatenr.isVerified=true,
         verifedPatenr.verificationCode=undefined
+        verifedPatenr.expiresAt =undefined
         await verifedPatenr.save()
         //send welcome email --------------
         await WelcomeEmail(verifedPatenr.email,verifedPatenr.StationName)
@@ -163,7 +164,10 @@ exports.viewAllPatnersController =async(req,res)=>{
     console.log("inside the ViewAll Patener Controller...😶‍🌫️😶‍🌫️😶‍🌫️😶‍🌫️")
     try{
         const allPartners =await patners.aggregate([
-            {  // need to display single user all station count
+            {
+                   $match:{isVerified:true}
+            },
+            { 
                 $lookup:{
                     from:"evstations",
                     localField:"_id",
