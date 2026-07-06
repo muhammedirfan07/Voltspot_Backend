@@ -9,7 +9,8 @@ const transporter = nodemailer.createTransport({
       pass: process.env.BREVO_SMTP_KEY,
     },
 });
-
+console.log("BREVO USER:", process.env.BREVO_SMTP_USER);
+console.log("BREVO KEY:", process.env.BREVO_SMTP_KEY);
 console.log("---Email access working----");
 
 transporter.verify((error, success) => {

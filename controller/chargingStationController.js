@@ -1,8 +1,6 @@
 const evstations = require("../Models/evChargingStationModel");
 const notifications = require("../Models/notificationModal");
 const { io, connectedPartners } = require("../Socket.io/socketConfig");
-const fs =require("fs")
-const path =require("path")
 // Utility function to validate latitude and longitude
 const isValidCoordinates = (longitude, latitude) => {
   const lon = parseFloat(longitude);
@@ -60,7 +58,6 @@ exports.addChargingStation = async (req, res) => {
     if (!isValidUrl(mapUrl)) {
       return res.status(400).json({ message: "Invalid mapUrl format" });
     }
-
     // Get image path from uploaded file
     const image = req.file ? req.file.path : null;
 
@@ -100,7 +97,7 @@ exports.addChargingStation = async (req, res) => {
 //---------------------------------------------------Get All Charging Stations to admin ---------------------------------------------------------------------------------
 exports.getAllStations = async (req, res) => {
   console.log("inside getAllStations.....🚗🚗🚗🚗🚗🚗");
-  
+
   try {
     const Allstations = await evstations.find({});
     res.status(200).json(Allstations);
@@ -158,7 +155,6 @@ exports.updateStation = async (req, res) => {
       city,
       state,
     } = req.body;
-    console.log("req.body:", req.body);
 
     const station = await evstations.findById(req.params.id);
     if (!station) return res.status(404).json({ message: "Station not found" });
@@ -178,28 +174,19 @@ exports.updateStation = async (req, res) => {
       state,
     };
 
-    // If a new image is uploaded, update the image path
     if (req.file) {
       updateData.image = req.file.path;
-
-      // delete old image file
-      if (station.image) {
-        fs.unlink(path.resolve(station.image), (err) => {
-          if (err) console.log("Old image delete failed:", err.message);
-        });
-      }
     }
 
     const updatedStation = await evstations.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true }
+      { new: true },
     );
 
     if (!updatedStation) {
       return res.status(404).json({ message: "Station not found" });
     } else {
-      // await res.updateStation.save()
       res.status(200).json(updatedStation);
     }
   } catch (error) {
@@ -218,13 +205,6 @@ exports.deleteStation = async (req, res) => {
     const deletedStation = await evstations.findByIdAndDelete(id);
     if (!deletedStation)
       return res.status(404).json({ message: "Station not found" });
-    
-    if (deletedStation.image) {
-      fs.unlink(path.resolve(deletedStation.image), (err) => {
-        if (err) console.log("Image delete failed:", err.message);
-      });
-    } 
-
     res.status(200).json({ message: "Station deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -261,8 +241,7 @@ exports.approveAndRejectStaion = async (req, res) => {
   const io = req.io;
   console.log("Inside the approve station controller🫂🫂🫂");
 
-  try { 
-  
+  try {
     const { status, rejectionReason } = req.body;
     const stationId = req.params.id;
     console.log("Station ID:", stationId);
@@ -276,7 +255,8 @@ exports.approveAndRejectStaion = async (req, res) => {
     station.status = status;
     station.rejectionReason =
       status === "rejected"
-        ? rejectionReason || "Your station is rejected for some reasons. Please inquire with us."
+        ? rejectionReason ||
+          "Your station is rejected for some reasons. Please inquire with us."
         : undefined;
     await station.save();
 
@@ -285,32 +265,30 @@ exports.approveAndRejectStaion = async (req, res) => {
       partnerId: station.partnerId,
       stationId: station._id,
       message:
-        status === "approved"
-        && `Your station "${station.stationName}" has been ${status}. Reason: ${station.rejectionReason}`,
-        status: status,
+        status === "approved" &&
+        `Your station "${station.stationName}" has been ${status}. Reason: ${station.rejectionReason}`,
+      status: status,
     });
     console.log("Station Partner ID:", station.partnerId);
-    console.log("new notification:",newnotification);
-    
-    await newnotification.save();
+    console.log("new notification:", newnotification);
 
+    await newnotification.save();
     // Emit notification if the partner is connected
-    try {
-      const partnerIdStr = station.partnerId.toString();
-      console.log("Current connectedPartners:", connectedPartners);
-      console.log("Checking for partner:", partnerIdStr);
-      if (connectedPartners[partnerIdStr]) {
-        io.to(connectedPartners[partnerIdStr]).emit("notification", {
-          message: newnotification.message,
-          status,
-        });
-      } else {
-        console.warn("Partner not connected:", partnerIdStr);
-      }
-    } catch (socketError) {
-      console.error("Socket emission error:", socketError);
-    }
-    
+    // try {
+    //   const partnerIdStr = station.partnerId.toString();
+    //   console.log("Current connectedPartners:", connectedPartners);
+    //   console.log("Checking for partner:", partnerIdStr);
+    //   if (connectedPartners[partnerIdStr]) {
+    //     io.to(connectedPartners[partnerIdStr]).emit("notification", {
+    //       message: newnotification.message,
+    //       status,
+    //     });
+    //   } else {
+    //     console.warn("Partner not connected:", partnerIdStr);
+    //   }
+    // } catch (socketError) {
+    //   console.error("Socket emission error:", socketError);
+    // }
   } catch (error) {
     console.error("Error updating station status:", error);
     res.status(500).json({
@@ -332,13 +310,12 @@ exports.viewAllStation = async (req, res) => {
   }
 };
 //-------------------------------------------------total ev station conunt ------------------------------------------------------------------------------------
-exports.getAllStationCount =async(req,res)=>{
+exports.getAllStationCount = async (req, res) => {
   console.log("inside the all stattion count.......");
-  try{
-      const numberOfStations = await evstations.countDocuments({})
-      res.status(200).json({conunt:numberOfStations})
-  }catch(err){
-      res.json(err)
+  try {
+    const numberOfStations = await evstations.countDocuments({});
+    res.status(200).json({ conunt: numberOfStations });
+  } catch (err) {
+    res.json(err);
   }
-  
-}
+};

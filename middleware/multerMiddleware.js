@@ -1,21 +1,16 @@
 const multer= require('multer') 
+const cloudinary = require("../Config/cloudinary")
+const {CloudinaryStorage}=require('multer-storage-cloudinary')
 
-const storage = multer.diskStorage({
-    destination: (req,file,callback)=>{
-        callback(null,'./uploads')
-    },
-    filename : (req,file,callback)=>{
-        callback(null,`image-${Date.now()}-${file.originalname}`)
+const storage = new CloudinaryStorage({
+    cloudinary:cloudinary,
+    params:{
+        folder:'voltspot',
+        allowed_formate:['jpg','jpeg','png']
     }
 })
 
-// const fileFilter = (req, file, cb) => {
-//     if (file.mimetype.startsWith("image/")) {
-//       cb(null, true);
-//     } else {
-//       cb(new Error("Only image files are allowed"), false);
-//     }
-//   };
+
 const multerMiddleware =multer({
     storage
 })
