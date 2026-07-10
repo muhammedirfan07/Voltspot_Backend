@@ -58,7 +58,7 @@ exports.stripeWebhook = async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET  
     );
   } catch (err) {
-    console.error("❌ Webhook signature error:", err.message);
+    console.error(" Webhook signature error:", err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -71,13 +71,13 @@ exports.stripeWebhook = async (req, res) => {
     const amount          = session.amount_total / 100; 
     const paymentIntentId = session.payment_intent;
 
-    console.log("🔔 metadata:", { userId, stationId, bookingId });
+    console.log(" metadata:", { userId, stationId, bookingId });
 
     try {
       // Guard against duplicate webhook retries
       const existing = await Payments.findOne({ transactionId: paymentIntentId });
       if (existing) {
-        console.log("⚠️ Duplicate webhook — already recorded");
+        console.log(" Duplicate webhook — already recorded");
         return res.json({ received: true });
       }
 
@@ -92,7 +92,7 @@ exports.stripeWebhook = async (req, res) => {
         status:        "completed",
       });
       await payment.save();
-      console.log("✅ Payment saved:", payment._id);
+      console.log(" Payment saved:", payment._id);
 
       // 2. Record wallet debit
       await new WalletTransaction({
@@ -102,7 +102,7 @@ exports.stripeWebhook = async (req, res) => {
         reason:    `Payment for booking #${bookingId || "—"}`,
         bookingId: bookingId || null,
       }).save();
-      console.log("✅ Wallet debit saved");
+      console.log(" Wallet debit saved");
 
       // 3. Confirm booking + remove TTL expiry so MongoDB doesn't delete it
       if (bookingId) {
@@ -115,14 +115,14 @@ exports.stripeWebhook = async (req, res) => {
           { new: true }
         );
         if (updated) {
-          console.log("✅ Booking confirmed:", updated._id, "status:", updated.status);
+          console.log(" Booking confirmed:", updated._id, "status:", updated.status);
         } else {
-          console.log("⚠️ Booking not found for id:", bookingId);
+          console.log(" Booking not found for id:", bookingId);
         }
       }
 
     } catch (err) {
-      console.error("❌ Error in webhook handler:", err);
+      console.error(" Error in webhook handler:", err);
     }
   }
 
@@ -134,10 +134,10 @@ exports.stripeWebhook = async (req, res) => {
       if (payment && payment.status !== "refunded") {
         payment.status = "refunded";
         await payment.save();
-        console.log("✅ Payment marked refunded:", payment._id);
+        console.log(" Payment marked refunded:", payment._id);
       }
     } catch (err) {
-      console.error("❌ Error updating refund:", err);
+      console.error(" Error updating refund:", err);
     }
   }
 

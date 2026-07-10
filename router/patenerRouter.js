@@ -17,8 +17,12 @@ router.post("/patner/patnerlogin",patnersController.patnerLoginController)
 router.get("/patner/checkPather-autho",PatnerAuthMiddleware,patnersController.checkPtnerAuthoContoller)
 //get all patners details-------------------------------------------------------------------
 router.get("/admin/viewAllPatener",patnersController.viewAllPatnersController)
-// get number of patners---------------------------------------------------------------------
+// get number of Partners---------------------------------------------------------------------
 router.get("/admin/patnerCount",patnersController.getAllPatnerCount)
+router.get("/PartnerProfile", PatnerAuthMiddleware, patnersController.getPartnerProfileController);
+
+router.get( "/BookingCharts",PatnerAuthMiddleware,patnersController.getPartnerBookingChartStats);
+router.get( "/PaymentsPageChart",PatnerAuthMiddleware,patnersController.getPartnerPaymentsOverview);
 
 // notification get 
 router.get ("/notifications",PatnerAuthMiddleware,patnersController.getallNotifiaction)

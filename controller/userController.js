@@ -275,6 +275,8 @@ exports.singleUserDetails = async (req, res) => {
     console.log("userid :", userId);
 
     const userDetails = await users.findById(userId);
+    console.log("userDetails=",userDetails);
+    
     res.status(200).json(userDetails);
     console.log("user Details :", userDetails);
   } catch (error) {
@@ -292,7 +294,7 @@ exports.updateUserProfile = async (req, res) => {
     if (fullName) updateData.fullName = fullName;
     if (phone) updateData.phone = phone;
     if (req.file) {
-      updateData.profileImage = `uploads/${req.file.filename}`;
+      updateData.profileImage = req.file.path
     }
 
     const updatedUser = await users.findByIdAndUpdate(

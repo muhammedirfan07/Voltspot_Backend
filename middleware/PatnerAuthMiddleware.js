@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const PatnerAuthMiddleware = (req, res, next) => {
     console.log("inside the partner middleware 😶😶");
     
-    const PartnerToken = req.headers["authorization"]?.split(" ")[1]; // Use optional chaining to prevent errors
+    const PartnerToken = req.headers["authorization"]?.split(" ")[1]; 
     if (!PartnerToken) return res.status(401).json({ message: "Token is missing" });
 
     try {

@@ -42,7 +42,8 @@ exports.getAvailableSlots = async (req, res) => {
       (slot) => !bookedSlotNumbers.includes(slot),
     );
 
-    res.status(200).json({ availableSlots });
+    res.status(200).json({ availableSlots,
+      bookedSlots: bookedSlotNumbers });
     console.log("slot:", availableSlots);
   } catch (error) {
     console.error("Error fetching available slots:", error);
@@ -77,7 +78,7 @@ exports.bookSlot = async (req, res) => {
 
     if (existingBooking)
       return res.status(400).json({
-        message: `Slot already booked for this time ${existingBooking.duration} hours`,
+        message: `Slot already booked for this time ${existingBooking.duration} hours`,value:true
       });
 
     const station = await evstations.findById(stationId);
@@ -97,7 +98,7 @@ exports.bookSlot = async (req, res) => {
     });
 
     await newBooking.save();
-    console.log("✅ New booking saved, _id:", newBooking._id);
+    console.log(" New booking saved, _id:", newBooking._id);
     res
       .status(200)
       .json({ message: "Slot booked successfully", booking: newBooking });
