@@ -13,7 +13,7 @@ const PatnerAuthMiddleware = (req, res, next) => {
             return res.status(403).json({ message: "Access denied for non-partners" });
         }
 
-        req.partnerId = response.partnerId;// Ensure correct key name
+        req.partnerId = response.partnerId;
         console.log("Partner Id:", req.partnerId);
         
         next();

@@ -159,6 +159,36 @@ exports.getPartnerProfileController = async (req, res) => {
     }
 };
 
+//  edit profile ---------------------------------
+exports.editPartnerProfileController = async (req, res) => {
+  console.log("inside editPartnerProfileController...✏️✏️✏️");
+  const { StationName, address } = req.body;
+
+  try {
+    const partnerId = req.partnerId;
+
+    if (!StationName?.trim() || !address?.trim()) {
+      return res.status(400).json({ status: false, message: "StationName and address are required" });
+    }
+
+    const updatedPartner = await patners.findByIdAndUpdate(
+        partnerId,
+        { StationName: StationName.trim(), address: address.trim() },
+        { new: true, runValidators: true }
+      )
+      .select("-password -verificationCode");
+
+    if (!updatedPartner) {
+      return res.status(404).json({ status: false, message: "Partner not found" });
+    }
+
+    res.status(200).json({ status: true, message: "Profile updated successfully", partner: updatedPartner });
+  } catch (error) {
+    console.error("editPartnerProfileController error:", error);
+    res.status(500).json({ status: false, message: "Error updating profile", error: error.message });
+  }
+};
+
 //patner registre verify email controller----------------------------------------------
 exports. verifyEmailController= async(req,res)=>{
     console.log("inside the verify email contoller...📩📩📩📩");

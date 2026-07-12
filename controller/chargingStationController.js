@@ -260,35 +260,29 @@ exports.approveAndRejectStaion = async (req, res) => {
         : undefined;
     await station.save();
 
+    // Build the correct message for both outcomes
+    const notificationMessage =
+      status === "approved"
+        ? `Your station "${station.stationName}" has been approved.`
+        : `Your station "${station.stationName}" has been rejected. Reason: ${station.rejectionReason}`;
+
     // Create a notification for the partner
     const newnotification = new notifications({
       partnerId: station.partnerId,
       stationId: station._id,
-      message:
-        status === "approved" &&
-        `Your station "${station.stationName}" has been ${status}. Reason: ${station.rejectionReason}`,
+      message: notificationMessage,
       status: status,
     });
     console.log("Station Partner ID:", station.partnerId);
     console.log("new notification:", newnotification);
 
     await newnotification.save();
-    // Emit notification if the partner is connected
-    // try {
-    //   const partnerIdStr = station.partnerId.toString();
-    //   console.log("Current connectedPartners:", connectedPartners);
-    //   console.log("Checking for partner:", partnerIdStr);
-    //   if (connectedPartners[partnerIdStr]) {
-    //     io.to(connectedPartners[partnerIdStr]).emit("notification", {
-    //       message: newnotification.message,
-    //       status,
-    //     });
-    //   } else {
-    //     console.warn("Partner not connected:", partnerIdStr);
-    //   }
-    // } catch (socketError) {
-    //   console.error("Socket emission error:", socketError);
-    // }
+
+    res.status(200).json({
+      message: "Station status updated successfully",
+      station,
+      notification: newnotification,
+    });
   } catch (error) {
     console.error("Error updating station status:", error);
     res.status(500).json({

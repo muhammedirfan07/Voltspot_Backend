@@ -19,9 +19,13 @@ router.get("/patner/checkPather-autho",PatnerAuthMiddleware,patnersController.ch
 router.get("/admin/viewAllPatener",patnersController.viewAllPatnersController)
 // get number of Partners---------------------------------------------------------------------
 router.get("/admin/patnerCount",patnersController.getAllPatnerCount)
+
 router.get("/PartnerProfile", PatnerAuthMiddleware, patnersController.getPartnerProfileController);
 
+router.post("/patner/profile",PatnerAuthMiddleware,patnersController.editPartnerProfileController)
+
 router.get( "/BookingCharts",PatnerAuthMiddleware,patnersController.getPartnerBookingChartStats);
+
 router.get( "/PaymentsPageChart",PatnerAuthMiddleware,patnersController.getPartnerPaymentsOverview);
 
 // notification get 
