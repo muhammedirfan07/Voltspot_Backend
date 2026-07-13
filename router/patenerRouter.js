@@ -22,7 +22,7 @@ router.get("/admin/patnerCount",patnersController.getAllPatnerCount)
 
 router.get("/PartnerProfile", PatnerAuthMiddleware, patnersController.getPartnerProfileController);
 
-router.post("/patner/profile",PatnerAuthMiddleware,patnersController.editPartnerProfileController)
+router.put("/patner/profile",PatnerAuthMiddleware,patnersController.editPartnerProfileController)
 
 router.get( "/BookingCharts",PatnerAuthMiddleware,patnersController.getPartnerBookingChartStats);
 
